@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan Yönetimi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+<div class="p-4">
+  <h2 class="text-2xl font-bold mb-4">Plan Yönetimi</h2>
+  <div class="overflow-x-auto">
+  <table class="w-full text-left border">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-2">ID</th>
+        <th class="p-2">İsim</th>
+        <th class="p-2">Fiyat</th>
+        <th class="p-2">Aktif mi?</th>
+        <th class="p-2">İşlemler</th>
+      </tr>
+    </thead>
+    <tbody id="plan-table-body"></tbody>
+  </table>
+  </div>
+
+  <div class="mt-6">
+    <input id="plan-name" placeholder="Plan Adı" class="border p-2 mr-2" />
+    <input id="plan-price" placeholder="Fiyat" type="number" class="border p-2 mr-2" />
+    <button onclick="createPlan()" class="bg-green-500 text-white px-4 py-2">Plan Ekle</button>
+  </div>
+</div>
+<script>
+async function fetchPlans() {
+  const res = await fetch("/api/plans");
+  const plans = await res.json();
+  const tbody = document.getElementById("plan-table-body");
+  tbody.innerHTML = "";
+  plans.forEach(p => {
+    tbody.innerHTML += `
+      <tr>
+        <td class="p-2">${p.id}</td>
+        <td class="p-2">${p.name}</td>
+        <td class="p-2">${p.price}</td>
+        <td class="p-2">${p.is_active ? "✅" : "❌"}</td>
+        <td class="p-2">
+          <button onclick="deletePlan(${p.id})" class="text-red-500">Sil</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+async function createPlan() {
+  const name = document.getElementById("plan-name").value;
+  const price = parseFloat(document.getElementById("plan-price").value);
+  await fetch("/api/plans", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, price })
+  });
+  fetchPlans();
+}
+
+async function deletePlan(id) {
+  await fetch(`/api/plans/${id}`, { method: "DELETE" });
+  fetchPlans();
+}
+
+fetchPlans();
+</script>
+</body>
+</html>

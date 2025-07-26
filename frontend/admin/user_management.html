@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kullanıcı Yönetimi | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 p-6">
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Kullanıcı Yönetimi</h1>
+    <div class="flex gap-4 mb-4">
+      <input id="search-email" placeholder="E-posta ara..." class="p-2 border rounded w-1/3" />
+      <select id="search-role" class="p-2 border rounded">
+        <option value="">Tüm Roller</option>
+        <option value="user">user</option>
+        <option value="admin">admin</option>
+        <option value="superadmin">superadmin</option>
+      </select>
+      <select id="search-plan" class="p-2 border rounded">
+        <option value="">Tüm Planlar</option>
+        <option value="Free">Free</option>
+        <option value="Pro">Pro</option>
+        <option value="Premium">Premium</option>
+      </select>
+      <button onclick="loadUsers()" class="bg-blue-600 text-white px-4 py-2 rounded">Filtrele</button>
+    </div>
+    <div class="overflow-x-auto">
+    <table class="w-full text-left border border-gray-300 rounded">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="p-2">ID</th>
+          <th class="p-2">E-posta</th>
+          <th class="p-2">Rol</th>
+          <th class="p-2">Plan</th>
+          <th class="p-2">Aktif mi?</th>
+          <th class="p-2">İşlem</th>
+        </tr>
+      </thead>
+      <tbody id="user-table-body"></tbody>
+    </table>
+    </div>
+
+    <hr class="my-6">
+    <h3 class="text-lg font-semibold mb-2">Yeni Kullanıcı Oluştur</h3>
+    <div class="flex flex-col md:flex-row gap-4">
+      <input id="new-email" placeholder="E-posta" class="p-2 border rounded w-full" />
+      <input id="new-password" placeholder="Şifre" type="password" class="p-2 border rounded w-full" />
+      <select id="new-role" class="p-2 border rounded">
+        <option value="user">user</option>
+        <option value="admin">admin</option>
+      </select>
+      <select id="new-plan" class="p-2 border rounded">
+        <option value="Free">Free</option>
+        <option value="Pro">Pro</option>
+        <option value="Premium">Premium</option>
+      </select>
+      <button onclick="createUser()" class="bg-green-600 text-white px-4 py-2 rounded">Ekle</button>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api/admin/users';
+    const JWT = sessionStorage.getItem('admin_jwt');
+
+    async function loadUsers() {
+      const email = document.getElementById('search-email').value;
+      const role = document.getElementById('search-role').value;
+      const plan = document.getElementById('search-plan').value;
+
+      const params = new URLSearchParams();
+      if (email) params.append('email', email);
+      if (role) params.append('role', role);
+      if (plan) params.append('subscription_level', plan);
+
+      const res = await fetch(API + '?' + params.toString(), {
+        headers: { 'Authorization': 'Bearer ' + JWT }
+      });
+
+      const users = await res.json();
+      const tbody = document.getElementById('user-table-body');
+      tbody.innerHTML = '';
+      users.forEach(u => {
+        tbody.innerHTML += `
+          <tr class="border-t">
+            <td class="p-2">${u.id}</td>
+            <td class="p-2">${u.email || ''}</td>
+            <td class="p-2">${u.role}</td>
+            <td class="p-2">${u.subscription_level}</td>
+            <td class="p-2">${u.is_active ? '✅' : '❌'}</td>
+            <td class="p-2">
+              ${u.is_active ? `<button onclick="deactivateUser(${u.id})" class="text-red-500 hover:underline">Pasifleştir</button>` : ''}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function createUser() {
+      const email = document.getElementById("new-email").value;
+      const password = document.getElementById("new-password").value;
+      const role = document.getElementById("new-role").value;
+      const plan = document.getElementById("new-plan").value;
+
+      const res = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": 'Bearer ' + JWT
+        },
+        body: JSON.stringify({ email, password, role, subscription_level: plan })
+      });
+
+      if (res.status === 201) {
+        alert("Kullanıcı oluşturuldu ✅");
+        loadUsers();
+      } else {
+        const err = await res.json();
+        alert("Hata: " + (err.error || "Bilinmeyen"));
+      }
+    }
+
+    async function deactivateUser(id) {
+      await fetch(API + '/' + id, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JWT
+        },
+        body: JSON.stringify({ is_active: false })
+      });
+      loadUsers();
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUsers);
+  </script>
+</body>
+</html>
+

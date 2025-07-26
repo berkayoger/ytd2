@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promosyon Kodları | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 p-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Promosyon Kodları</h1>
+      <button onclick="openModal()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">+ Yeni Kod</button>
+    </div>
+
+    <div class="mb-4">
+      <label class="mr-2">Plan:</label>
+      <select id="filter-plan" onchange="loadPromos()" class="border px-2 py-1 rounded">
+        <option value="">Tümü</option>
+        <option value="BASIC" title="Temel Plan">BASIC</option>
+        <option value="ADVANCED" title="Gelişmiş Plan">ADVANCED</option>
+        <option value="PREMIUM" title="Premium Plan">PREMIUM</option>
+      </select>
+
+      <label class="ml-4 mr-2">Durum:</label>
+      <select id="filter-status" onchange="loadPromos()" class="border px-2 py-1 rounded">
+        <option value="">Tümü</option>
+        <option value="active">Aktif</option>
+        <option value="expired">Süresi Dolmuş</option>
+        <option value="inactive">Pasif</option>
+      </select>
+    </div>
+
+    <div class="my-4 flex items-center space-x-4">
+      <label>Başlangıç:</label>
+      <input type="date" id="filter-start" class="border px-2 py-1 rounded">
+      <label>Bitiş:</label>
+      <input type="date" id="filter-end" class="border px-2 py-1 rounded">
+      <button onclick="loadPromoStats()" class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">Filtrele</button>
+    </div>
+
+    <div class="overflow-x-auto">
+    <table class="w-full table-auto border-collapse border border-gray-300">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="border px-4 py-2">Kod</th>
+          <th class="border px-4 py-2">Plan</th>
+          <th class="border px-4 py-2">Süre</th>
+          <th class="border px-4 py-2">Max Kullanım</th>
+          <th class="border px-4 py-2">Mevcut Kullanım</th>
+          <th class="border px-4 py-2">Son Tarih</th>
+          <th class="border px-4 py-2">Kullanıcıya Özel</th>
+          <th class="border px-4 py-2">Aktif?</th>
+          <th class="border px-4 py-2">İşlemler</th>
+        </tr>
+      </thead>
+      <tbody id="promo-table"></tbody>
+    </table>
+    </div>
+
+    <div class="mt-6">
+      <canvas id="promoChart" height="100"></canvas>
+    </div>
+
+    <div class="mt-6">
+      <canvas id="promoStatsChart" height="100"></canvas>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="promoModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center">
+    <div class="bg-white p-6 rounded shadow-lg max-w-md w-full">
+      <h2 class="text-xl font-semibold mb-4" id="modalTitle">Yeni Kod</h2>
+      <input type="hidden" id="promo-id">
+      <div class="space-y-3">
+        <input id="code" type="text" placeholder="Kod" class="w-full border px-3 py-2 rounded">
+        <select id="plan" class="w-full border px-3 py-2 rounded">
+          <option value="BASIC">BASIC</option>
+          <option value="ADVANCED">ADVANCED</option>
+          <option value="PREMIUM">PREMIUM</option>
+        </select>
+        <input id="duration" type="number" placeholder="Süre (gün)" class="w-full border px-3 py-2 rounded">
+        <input id="max-uses" type="number" placeholder="Max Kullanım" class="w-full border px-3 py-2 rounded">
+        <input id="expires-at" type="date" class="w-full border px-3 py-2 rounded">
+        <input id="target-user" type="text" placeholder="(Opsiyonel) Kullanıcı E-postası" class="w-full border px-3 py-2 rounded">
+      </div>
+      <div class="mt-4 flex justify-end space-x-2">
+        <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded">İptal</button>
+        <button onclick="submitPromo()" class="bg-blue-600 text-white px-4 py-2 rounded">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api/admin/promo-codes';
+    const JWT = sessionStorage.getItem("admin_jwt");
+
+    async function loadPromos() {
+      const res = await fetch(API + '/', {
+        headers: { 'Authorization': 'Bearer ' + JWT }
+      });
+      const promos = await res.json();
+      const planFilter = document.getElementById("filter-plan").value;
+      const statusFilter = document.getElementById("filter-status").value;
+      const table = document.getElementById("promo-table");
+      table.innerHTML = '';
+      const stats = {};
+
+      for (let p of promos) {
+        const expired = p.expires_at && new Date(p.expires_at) < new Date();
+        const inactive = !p.is_active;
+        const status = expired ? 'expired' : (inactive ? 'inactive' : 'active');
+
+        if (planFilter && p.plan !== planFilter) continue;
+        if (statusFilter && status !== statusFilter) continue;
+
+        stats[p.plan] = (stats[p.plan] || 0) + 1;
+
+        const row = document.createElement('tr');
+        row.className = expired || inactive ? 'bg-red-100 text-red-700' : '';
+        row.innerHTML = `
+          <td class="border px-4 py-2">${p.code}</td>
+          <td class="border px-4 py-2">${p.plan}</td>
+          <td class="border px-4 py-2">${p.duration_days}</td>
+          <td class="border px-4 py-2">${p.max_uses}</td>
+          <td class="border px-4 py-2">${p.current_uses}</td>
+          <td class="border px-4 py-2">${p.expires_at ? p.expires_at.split('T')[0] : '-'}</td>
+          <td class="border px-4 py-2">${p.user_email || '-'}</td>
+          <td class="border px-4 py-2">${p.is_active ? '✅' : '❌'}</td>
+          <td class="border px-4 py-2">
+            <button onclick='editPromo(${JSON.stringify(p)})' class="text-blue-600 font-bold">✏️</button>
+            <button onclick='deletePromo(${p.id})' class="text-red-600 font-bold ml-2">🗑️</button>
+          </td>`;
+        table.appendChild(row);
+      }
+
+      const chart = document.getElementById("promoChart");
+      if (window.promoChartInstance) window.promoChartInstance.destroy();
+      window.promoChartInstance = new Chart(chart, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(stats),
+          datasets: [{
+            label: 'Kod Sayısı',
+            data: Object.values(stats),
+            backgroundColor: '#6366f1'
+          }]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    function openModal() {
+      document.getElementById("promoModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("promoModal").classList.add("hidden");
+      document.getElementById("promo-id").value = '';
+      document.getElementById("code").value = '';
+      document.getElementById("plan").value = 'BASIC';
+      document.getElementById("duration").value = '';
+      document.getElementById("max-uses").value = '';
+      document.getElementById("expires-at").value = '';
+      document.getElementById("target-user").value = '';
+    }
+
+    function editPromo(p) {
+      document.getElementById("promo-id").value = p.id;
+      document.getElementById("code").value = p.code;
+      document.getElementById("plan").value = p.plan;
+      document.getElementById("duration").value = p.duration_days;
+      document.getElementById("max-uses").value = p.max_uses;
+      document.getElementById("expires-at").value = p.expires_at ? p.expires_at.split('T')[0] : '';
+      document.getElementById("target-user").value = p.user_email || '';
+      openModal();
+    }
+
+    async function submitPromo() {
+      const id = document.getElementById("promo-id").value;
+      const expiresInput = document.getElementById("expires-at").value;
+      const expiresAt = expiresInput ? new Date(expiresInput).toISOString() : null;
+      const payload = {
+        code: document.getElementById("code").value,
+        plan: document.getElementById("plan").value,
+        duration_days: parseInt(document.getElementById("duration").value),
+        max_uses: parseInt(document.getElementById("max-uses").value),
+        expires_at: expiresAt,
+        user_email: document.getElementById("target-user").value || null
+      };
+      const method = id ? 'PATCH' : 'POST';
+      const url = id ? `${API}/${id}` : `${API}/`;
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Authorization': 'Bearer ' + JWT,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        loadPromos();
+        closeModal();
+        alert("✅ Promosyon kodu başarıyla kaydedildi.");
+      } else {
+        alert("❌ İşlem başarısız");
+      }
+    }
+
+    async function deletePromo(id) {
+      if (!confirm("Silmek istiyor musunuz?")) return;
+      await fetch(`${API}/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + JWT }
+      });
+      loadPromos();
+    }
+
+    async function loadPromoStats() {
+      const start = document.getElementById("filter-start").value;
+      const end = document.getElementById("filter-end").value;
+
+      let url = "/api/admin/promo-codes/stats";
+      const params = [];
+      if (start) params.push("start_date=" + start);
+      if (end) params.push("end_date=" + end);
+      if (params.length) url += "?" + params.join("&");
+
+      const res = await fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + JWT }
+      });
+      const data = await res.json();
+
+      const labels = data.map(x => x.code);
+      const counts = data.map(x => x.count);
+
+      const ctx = document.getElementById("promoStatsChart");
+      if (window.promoStatsChartInstance) window.promoStatsChartInstance.destroy();
+      window.promoStatsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Kullanım Sayısı',
+            data: counts,
+            backgroundColor: '#10b981'
+          }]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadPromos();
+      loadPromoStats();
+    });
+  </script>
+</body>
+</html>

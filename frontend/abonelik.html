@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTDCrypto - Abonelik Planları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Sabit arka plan fotoğrafı */
+            background-image: url('https://www.coinkolik.com/wp-content/uploads/2023/12/gunun-one-cikan-kripto-paralari-30-aralik-2023.jpg'); /* Buraya kendi fotoğraf URL'nizi ekleyebilirsiniz */
+            background-size: cover; /* Resmi tüm alanı kaplayacak şekilde ayarla */
+            background-position: center center; /* Resmi ortala */
+            background-attachment: fixed; /* Resmi sabit tut, içerik hareket etsin */
+            background-color: #0d1117; /* Resim yüklenmezse veya saydamlıkta görülecek fallback renk */
+            color: #e2e8f0; /* Açık metin rengi */
+        }
+        .header-bg {
+            background-color: rgba(22, 27, 34, 0.9); /* Yarı saydam header */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px); /* Hafif bulanıklık efekti */
+        }
+        /* Genel buton base stilleri */
+        .btn-base {
+            padding: 1rem 2.5rem; /* Geniş butonlar için */
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 700; /* font-bold */
+            border: none;
+            border-radius: 9999px; /* rounded-full */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4); /* Hafif gölge */
+        }
+        .btn-base:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.5);
+        }
+        .btn-base::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn-base:hover::before {
+            left: 100%;
+        }
+        .btn-base:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Ana Degrade Buton Stili */
+        .btn-gradient {
+            background: linear-gradient(45deg, #a855f7, #6366f1); /* Mor-İndigo degrade */
+            color: white;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(45deg, #be185d, #a855f7); /* Hover'da renk değişimi */
+        }
+
+        /* Outlined Stil (Header'daki linkler için) */
+        .btn-outline-header {
+            background: transparent;
+            border: 2px solid #6366f1; /* İndigo-500 */
+            color: #6366f1;
+            padding: 0.75rem 1.5rem; /* Daha küçük butonlar */
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 9999px; /* rounded-full */
+            box-shadow: none;
+        }
+        .btn-outline-header:hover {
+            background-color: #6366f1;
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .card-plan {
+            background-color: rgba(30, 41, 59, 0.8); /* slate-800'ün %80 opak hali */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155; /* slate-700 */
+            backdrop-filter: blur(5px); /* Daha güçlü bulanıklık */
+        }
+        .card-plan:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            transform: translateY(-5px);
+            border-color: #6366f1; /* İndigo-500 */
+        }
+        .price-text {
+            font-size: 3rem; /* text-5xl */
+            font-weight: 700; /* font-bold */
+            color: #14b8a6; /* Tailwind 'teal-600' */
+        }
+        .feature-list li {
+            display: flex;
+            align-items: flex-start; /* Metin birden fazla satıra yayılırsa hizalama */
+            gap: 0.5rem;
+            margin-bottom: 0.75rem; /* Biraz daha boşluk */
+            color: #cbd5e1; /* slate-300 */
+        }
+        .feature-icon {
+            color: #10b981; /* Emerald-500 */
+            font-size: 1.25rem; /* text-xl */
+            line-height: 1.5rem; /* Emojiyi hizalamak için */
+            flex-shrink: 0; /* İçeriğin kaymasını engelle */
+        }
+        .section-heading {
+            font-size: 3rem;
+            font-weight: 800; /* font-extrabold */
+            text-align: center;
+            margin-bottom: 4rem;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            position: relative;
+        }
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 2px;
+        }
+
+        .warning-box {
+            background-color: rgba(255, 237, 213, 0.9); /* amber-100'ün opak hali */
+            color: #b45309; /* amber-800 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: 500;
+            backdrop-filter: blur(3px);
+        }
+
+        /* Mesaj kutularının yeni temaya uyumu */
+        .message-box {
+            background-color: rgba(30, 41, 59, 0.9); /* slate-800'ün opak hali */
+            color: #e2e8f0; /* slate-200 */
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 500;
+            backdrop-filter: blur(3px);
+            border: 1px solid #475569; /* slate-600 */
+        }
+        .message-success {
+            background-color: rgba(16, 185, 129, 0.9); /* emerald-500'ün opak hali */
+            color: white;
+        }
+        .message-error {
+            background-color: rgba(239, 68, 68, 0.9); /* red-500'ün opak hali */
+            color: white;
+        }
+        .llm-response-area-style {
+            background-color: rgba(30, 41, 59, 0.6); /* slate-800'ün daha şeffaf hali */
+            color: #cbd5e1; /* slate-300 */
+            border: 1px solid #475569;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .btn-base {
+                padding: 0.75rem 1.5rem; /* Daha küçük butonlar */
+                font-size: 1rem;
+                min-width: auto;
+            }
+            .header-bg nav {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+        }
+        @media (max-width: 640px) { /* sm breakpoint */
+            .btn-base {
+                width: 100%;
+                max-width: 250px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+    </style>
+</head>
+<body class="selection:bg-violet-700 selection:text-white">
+
+    <!-- Header -->
+    <header class="header-bg py-4 sticky top-0 z-10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 class="text-xl sm:text-3xl font-bold text-white">YTDCrypto Abonelik Planları</h1>
+            <nav class="flex items-center space-x-4 flex-wrap justify-center">
+                <a href="index.html" class="btn-base btn-outline-header">Ana Panele Dön</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content - Subscription Plans -->
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <section class="text-center mb-12">
+            <h2 class="section-heading">Size Uygun Planı Seçin</h2>
+            <p class="text-lg text-slate-300 max-w-2xl mx-auto">YTDCrypto'nun tüm özelliklerinden faydalanmak için farklı abonelik seçeneklerimizi keşfedin.</p>
+            <p id="current-subscription-status" class="text-md mt-4 font-semibold text-slate-200">Mevcut Aboneliğiniz: Yükleniyor...</p>
+            <div id="subscription-warning" class="warning-box hidden">
+                <!-- Deneme süresi uyarısı buraya gelecek -->
+            </div>
+            <div class="overflow-x-auto mt-6">
+                <table class="min-w-full text-sm text-center text-slate-200">
+                    <thead>
+                        <tr>
+                            <th class="border px-2 py-1">Özellik</th>
+                            <th class="border px-2 py-1">TRIAL</th>
+                            <th class="border px-2 py-1">BASIC</th>
+                            <th class="border px-2 py-1">PREMIUM</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border px-2 py-1">RSI/MACD Analizi</td>
+                            <td class="border">✗</td>
+                            <td class="border">✓</td>
+                            <td class="border">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="border px-2 py-1">LLM Analizleri</td>
+                            <td class="border">✗</td>
+                            <td class="border">✗</td>
+                            <td class="border">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="border px-2 py-1">Anlık Alarm Bildirimleri</td>
+                            <td class="border">✗</td>
+                            <td class="border">✗</td>
+                            <td class="border">✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Temel Plan (Basic Plan) -->
+            <div class="card-plan p-6 flex flex-col justify-between" data-plan="basic">
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4 text-center">Temel Plan</h3>
+                    <div class="text-center mb-6">
+                        <span class="price-text">$9.99</span><span class="text-slate-400"> / Ay</span>
+                    </div>
+                    <ul class="feature-list mb-8">
+                        <li><span class="feature-icon">✔️</span> Temel Analiz Raporları (RSI, SMA)</li>
+                        <li><span class="feature-icon">✔️</span> Popüler Coinlere Erişim</li>
+                        <li><span class="feature-icon">✔️</span> Günlük Sinyal Özeti</li>
+                        <li><span class="feature-icon">✔️</span> Simüle Edilmiş LLM Açıklamaları</li>
+                        <li><span class="feature-icon">✔️</span> WebSocket Bildirimleri</li>
+                    </ul>
+                </div>
+                <button class="btn-base btn-gradient mt-auto select-plan-btn" data-plan-id="basic">Abone Ol</button>
+            </div>
+
+            <!-- Gelişmiş Plan (Advanced Plan) -->
+            <div class="card-plan p-6 flex flex-col justify-between border-2 border-indigo-500 shadow-lg" data-plan="advanced">
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4 text-center">Gelişmiş Plan</h3>
+                    <div class="text-center mb-6">
+                        <span class="price-text">$14.99</span><span class="text-slate-400"> / Ay</span>
+                    </div>
+                    <ul class="feature-list mb-8">
+                        <li><span class="feature-icon">✔️</span> Temel Planın Tüm Özellikleri</li>
+                        <li><span class="feature-icon">✔️</span> Gelişmiş AI Tahminleri (Prophet)</li>
+                        <li><span class="feature-icon">✔️</span> Tüm Coinlere Erişim</li>
+                        <li><span class="feature-icon">✔️</span> Özel Haber Akışı</li>
+                        <li><span class="feature-icon">✔️</span> Backend Üretimi Grafikler</li>
+                        <li><span class="feature-icon">✔️</span> Yatırımcı Profili Seçimi</li>
+                    </ul>
+                </div>
+                <button class="btn-base btn-gradient mt-auto select-plan-btn" data-plan-id="advanced">Abone Ol</button>
+            </div>
+
+            <!-- Premium Plan (Premium Plan) -->
+            <div class="card-plan p-6 flex flex-col justify-between" data-plan="premium">
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4 text-center">Premium Plan</h3>
+                    <div class="text-center mb-6">
+                        <span class="price-text">$19.99</span><span class="text-slate-400"> / Ay</span>
+                    </div>
+                    <ul class="feature-list mb-8">
+                        <li><span class="feature-icon">✔️</span> Gelişmiş Planın Tüm Özellikleri</li>
+                        <li><span class="feature-icon">✔️</span> Öncelikli Destek</li>
+                        <li><span class="feature-icon">✔️</span> Daha Sık Analiz Güncellemeleri</li>
+                        <li><span class="feature-icon">✔️</span> Gelecekteki Beta Özelliklere Erişim</li>
+                        <li><span class="feature-icon">✔️</span> Kişiselleştirilmiş Rapor Özeti (LLM)</li>
+                    </ul>
+                </div>
+                <button class="btn-base btn-gradient mt-auto select-plan-btn" data-plan-id="premium">Abone Ol</button>
+            </div>
+        </div>
+        <div id="message-container" class="message-box hidden"></div>
+
+        <!-- ✨ Abonelik Danışmanı (LLM Destekli) ✨ -->
+        <section class="card-plan p-6 mt-8">
+            <h2 class="text-xl font-bold mb-4 text-white text-center">✨ Abonelik Danışmanı ✨</h2>
+            <p class="text-sm text-slate-300 mb-6 text-center max-w-2xl mx-auto">
+                Hangi abonelik planının size en uygun olduğunu merak mı ediyorsunuz? Bütçenizi, yatırım hedeflerinizi veya beklentilerinizi yazın, yapay zeka danışmanımız size özel bir öneride bulunsun.
+            </p>
+            <div class="space-y-4">
+                <div>
+                    <label for="llm-query-input" class="block text-sm font-medium text-slate-200 mb-1">İhtiyaçlarınızı veya sorularınızı yazın:</label>
+                    <textarea id="llm-query-input" rows="4" class="block w-full px-3 py-2 border border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-slate-700 text-slate-100" placeholder="Örn: 'Yeni başlayanım, günlük 100 dolar bütçem var, hangi plan bana uygun?'"></textarea>
+                </div>
+                <button id="llm-consult-btn" class="btn-base btn-gradient flex items-center justify-center gap-2">
+                    <span id="llm-button-text">Danışmandan Öneri Al</span>
+                    <div id="llm-button-loader" class="loader hidden"></div>
+                </button>
+                <div id="llm-response-area" class="mt-4 p-4 bg-slate-700 rounded-lg text-slate-200 hidden llm-response-area-style">
+                    <!-- LLM yanıtı buraya gelecek -->
+                </div>
+                <div id="llm-message-box" class="message-box hidden"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="header-bg text-white py-6 mt-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-400 text-sm">
+            &copy; 2024 YTDCrypto. Tüm Hakları Saklıdır.
+        </div>
+    </footer>
+
+    <script>
+        const BACKEND_BASE_URL = 'http://localhost:5000';
+        const UPDATE_SUBSCRIPTION_URL = `${BACKEND_BASE_URL}/api/update_subscription`; 
+        const GET_USER_SUBSCRIPTION_URL = `${BACKEND_BASE_URL}/api/get_subscription_status`; 
+
+        // Gemini API'si doğrudan frontend'den çağrılıyor. API_KEY'i boş bırakın, Canvas ortamı otomatik enjekte edecektir.
+        const GEMINI_API_KEY = ""; 
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+
+        const userApiKey = sessionStorage.getItem('ytdcrypto_api_key');
+        const currentSubscriptionStatusElement = document.getElementById('current-subscription-status');
+        const selectPlanButtons = document.querySelectorAll('.select-plan-btn');
+        const messageContainer = document.getElementById('message-container');
+        const subscriptionWarning = document.getElementById('subscription-warning');
+
+        const llmQueryInput = document.getElementById('llm-query-input');
+        const llmConsultBtn = document.getElementById('llm-consult-btn');
+        const llmButtonText = document.getElementById('llm-button-text');
+        const llmButtonLoader = document.getElementById('llm-button-loader');
+        const llmResponseArea = document.getElementById('llm-response-area');
+        const llmMessageBox = document.getElementById('llm-message-box');
+
+        // Sayfa yüklendiğinde mevcut abonelik durumunu kontrol et
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!userApiKey) {
+                alert("Abonelik planlarını görüntülemek için lütfen giriş yapın.");
+                window.location.href = window.location.origin + '/giris.html'; // Tam URL kullanıldı
+                return;
+            }
+            fetchCurrentSubscriptionStatus();
+        });
+
+        // Mevcut abonelik durumunu backend'den çek
+        async function fetchCurrentSubscriptionStatus() {
+            try {
+                const response = await fetch(GET_USER_SUBSCRIPTION_URL, {
+                    method: 'GET',
+                    headers: {
+                        'X-API-KEY': userApiKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({error: 'Yanıt JSON değil.'}));
+                    throw new Error(errorData.error || `HTTP Hata: ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentSubscriptionStatusElement.textContent = `Mevcut Aboneliğiniz: ${data.subscription_level.toUpperCase()}`;
+                highlightCurrentPlan(data.subscription_level);
+
+                // Deneme süresi uyarısı kontrolü
+                if (data.subscription_level.toLowerCase() === 'trial' && data.subscription_end) {
+                    const endDate = new Date(data.subscription_end);
+                    const today = new Date();
+                    const diffTime = endDate.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Kalan gün sayısı
+
+                    if (diffDays > 0 && diffDays <= 2) {
+                        subscriptionWarning.innerHTML = `
+                            Deneme sürenizin bitmesine sadece <span class="font-bold">${diffDays} gün</span> kaldı! Aboneliğiniz dolduktan sonra bazı özelliklere erişemeyebilirsiniz. 
+                            <a href="#" id="upgrade-now-link" class="inline-block mt-2 text-sm font-semibold text-teal-800 hover:underline">
+                                Hemen Yükselt →
+                            </a>
+                        `;
+                        subscriptionWarning.classList.remove('hidden');
+                        // "Hemen Yükselt" linkine event listener ekle
+                        document.getElementById('upgrade-now-link').addEventListener('click', (e) => {
+                            e.preventDefault();
+                            // Kullanıcıyı abonelik kartlarına kaydırabilir veya modal açabilir.
+                            // Şimdilik sadece uyarıyı gösterip bir yere tıklamalarını teşvik ediyoruz.
+                            showMessage(messageContainer, "Lütfen yukarıdaki abonelik planlarından birini seçerek yükseltme yapın.", 'success');
+                            document.querySelector('main').scrollIntoView({ behavior: 'smooth' }); // Planlara kaydır
+                        });
+                    } else if (diffDays <= 0) {
+                        subscriptionWarning.innerHTML = `
+                            Deneme süreniz sona erdi! Bazı özelliklere erişiminiz kısıtlanmış olabilir. 
+                            <a href="#" id="upgrade-now-link-expired" class="inline-block mt-2 text-sm font-semibold text-teal-800 hover:underline">
+                                Aboneliği Yenile →
+                            </a>
+                        `;
+                        subscriptionWarning.classList.remove('hidden');
+                         document.getElementById('upgrade-now-link-expired').addEventListener('click', (e) => {
+                            e.preventDefault();
+                            showMessage(messageContainer, "Lütfen yukarıdaki abonelik planlarından birini seçerek aboneliğinizi yenileyin.", 'success');
+                            document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+                        });
+                    } else {
+                        subscriptionWarning.classList.add('hidden'); // Uyarı yoksa gizle
+                    }
+                } else {
+                    subscriptionWarning.classList.add('hidden'); // Deneme değilse veya tarih yoksa gizle
+                }
+
+            } catch (error) {
+                console.error("Mevcut abonelik durumu çekilirken hata:", error);
+                currentSubscriptionStatusElement.textContent = `Mevcut Abonelik Yüklenemedi: ${error.message}`;
+                showMessage(messageContainer, `Mevcut abonelik durumunuzu alırken hata oluştu: ${error.message}`, 'error');
+            }
+        }
+
+        // Mevcut planı arayüzde vurgula
+        function highlightCurrentPlan(currentPlan) {
+            document.querySelectorAll('.card-plan').forEach(card => { /* card yerine card-plan kullanıldı */
+                card.classList.remove('border-2', 'border-teal-600', 'shadow-lg', 'border-indigo-500'); /* indigo-500 kaldırıldı */
+                if (card.dataset.plan === currentPlan) {
+                    card.classList.add('border-2', 'border-teal-600', 'shadow-lg'); /* Mevcut planı vurgula */
+                    const button = card.querySelector('.select-plan-btn');
+                    if (button) {
+                        button.textContent = 'Mevcut Planınız';
+                        button.disabled = true;
+                        button.classList.remove('btn-base', 'btn-gradient'); /* Yeni buton stilleri */
+                        button.classList.add('bg-slate-300', 'text-slate-600', 'cursor-not-allowed');
+                    }
+                } else {
+                     const button = card.querySelector('.select-plan-btn');
+                    if (button) {
+                        button.textContent = 'Abone Ol';
+                        button.disabled = false;
+                        button.classList.add('btn-base', 'btn-gradient'); /* Yeni buton stilleri */
+                        button.classList.remove('bg-slate-300', 'text-slate-600', 'cursor-not-allowed');
+                    }
+                }
+            });
+        }
+
+        // Abone Ol butonlarına tıklama işlevi
+        selectPlanButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const planId = button.dataset.planId;
+                if (!planId) return;
+
+                // Onay mesajı
+                if (!confirm(`${planId.toUpperCase()} planına abone olmak istediğinize emin misiniz?`)) {
+                    return;
+                }
+
+                // Butonu devre dışı bırak ve yükleme göster
+                button.disabled = true;
+                button.textContent = 'İşleniyor...';
+                messageContainer.classList.add('hidden');
+
+                try {
+                    const response = await fetch(UPDATE_SUBSCRIPTION_URL, {
+                        method: 'POST',
+                        headers: {
+                            'X-API-KEY': userApiKey,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ plan: planId })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({error: 'Yanıt JSON değil.'}));
+                        throw new Error(errorData.error || `HTTP Hata: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        showMessage(messageContainer, `Başarılı: ${data.status || 'Planınız güncellendi!'}`, 'success');
+                        // sessionstorage'ı güncelle (eğer backend'den dönen plan varsa)
+                        sessionStorage.setItem('ytdcrypto_subscription_level', data.subscription_level); // Backend'den dönen subscription_level'ı kaydet
+                        highlightCurrentPlan(data.subscription_level); // UI'ı güncelle - backend'den dönen değeri kullan
+                        // Abonelik durumu uyarılarını yenile
+                        fetchCurrentSubscriptionStatus();
+                    } else {
+                        showMessage(messageContainer, `Hata: ${data.error || 'Plan güncellenirken bir sorun oluştu.'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error("Abonelik güncelleme hatası:", error);
+                    showMessage(messageContainer, `Abonelik güncellenirken bir ağ hatası oluştu: ${error.message}`, 'error');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Abone Ol'; // Başka bir plana abone olmaya izin vermek için
+                }
+            });
+        });
+
+        // LLM Danışman Butonu İşlevi
+        llmConsultBtn.addEventListener('click', async () => {
+            const userQuery = llmQueryInput.value.trim();
+            if (!userQuery) {
+                showMessage(llmMessageBox, "Lütfen bir soru veya ihtiyacınızı yazın.", 'error');
+                return;
+            }
+
+            llmConsultBtn.disabled = true;
+            llmButtonText.textContent = 'Analiz Ediliyor...';
+            llmButtonLoader.classList.remove('hidden');
+            llmResponseArea.classList.add('hidden');
+            llmMessageBox.classList.add('hidden');
+
+            const currentPlan = currentSubscriptionStatusElement.textContent.replace('Mevcut Aboneliğiniz: ', '').toLowerCase();
+            const planDetails = {
+                "basic": "Temel analiz raporları (RSI, SMA), popüler coinlere erişim, günlük sinyal özeti, simüle edilmiş LLM açıklamaları, WebSocket bildirimleri. Aylık $9.99.",
+                "advanced": "Temel planın tüm özelliklerine ek olarak: Gelişmiş AI tahminleri (Prophet), tüm coinlere erişim, özel haber akışı, backend üretimi grafikler, yatırımcı profili seçimi. Aylık $14.99.",
+                "premium": "Gelişmiş planın tüm özelliklerine ek olarak: Öncelikli destek, daha sık analiz güncellemeleri, gelecekteki beta özelliklere erişim, kişiselleştirilmiş rapor özeti (gerçek LLM destekli). Aylık $19.99."
+            };
+
+            const prompt = `YTDCrypto adlı bir kripto analiz platformu için abonelik danışmanısın. Kullanıcı, mevcut planı "${currentPlan}" iken "${userQuery}" şeklinde bir soru sordu. Abonelik planları şunlardır:\n\n` +
+                           `Temel Plan: ${planDetails.basic}\n` +
+                           `Gelişmiş Plan: ${planDetails.advanced}\n` +
+                           `Premium Plan: ${planDetails.premium}\n\n` +
+                           `Bu abonelik planlarını ve kullanıcının sorusunu dikkate alarak, kullanıcının ihtiyacına en uygun planı veya planlar arasındaki farkları detaylı, anlaşılır ve kibar bir dille açıklayın. En fazla 200 kelime kullanın.`;
+
+            try {
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }]
+                };
+
+                const response = await fetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API Hatası: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const llmText = result.candidates[0].content.parts[0].text;
+                    llmResponseArea.innerHTML = `<p>${llmText}</p>`;
+                    llmResponseArea.classList.remove('hidden');
+                    showMessage(llmMessageBox, "Danışman yanıtı başarıyla alındı.", 'success');
+                } else {
+                    throw new Error("LLM'den geçerli bir yanıt alınamadı.");
+                }
+            } catch (error) {
+                console.error("LLM danışmanı hatası:", error);
+                llmResponseArea.classList.add('hidden');
+                showMessage(llmMessageBox, `Danışman yanıtı alınırken hata oluştu: ${error.message}`, 'error');
+            } finally {
+                llmConsultBtn.disabled = false;
+                llmButtonText.textContent = 'Danışmandan Öneri Al';
+                llmButtonLoader.classList.add('hidden');
+            }
+        });
+
+
+        // Mesaj gösterme yardımcı fonksiyonu
+        function showMessage(element, msg, type) {
+            element.textContent = msg;
+            element.classList.remove('hidden', 'message-success', 'message-error');
+            element.classList.add(type === 'success' ? 'message-success' : 'message-error');
+            element.classList.add('block'); // Mesajın görünür olmasını sağla
+        }
+    </script>
+</body>
+</html>

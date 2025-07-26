@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kullanım Sınırları | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 p-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Kullanım Sınırları</h1>
+      <button onclick="openModal()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">+ Yeni Sınır</button>
+    </div>
+
+    <div class="overflow-x-auto">
+    <table class="w-full table-auto border-collapse border border-gray-300">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="border px-4 py-2">Plan</th>
+          <th class="border px-4 py-2">Özellik</th>
+          <th class="border px-4 py-2">Günlük Limit</th>
+          <th class="border px-4 py-2">Aylık Limit</th>
+          <th class="border px-4 py-2">İşlemler</th>
+        </tr>
+      </thead>
+      <tbody id="limit-table">
+        <!-- JS ile doldurulacak -->
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="limitModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center">
+    <div class="bg-white p-6 rounded shadow-lg max-w-md w-full">
+      <h2 class="text-xl font-semibold mb-4" id="modalTitle">Yeni Limit</h2>
+      <input type="hidden" id="limit-id">
+      <div class="space-y-3">
+        <input id="plan-name" type="text" placeholder="Plan Adı" class="w-full border px-3 py-2 rounded">
+          <input id="feature" type="text" placeholder="Özellik (feature)" class="w-full border px-3 py-2 rounded">
+        <input id="daily-limit" type="number" placeholder="Günlük Limit" class="w-full border px-3 py-2 rounded">
+        <input id="monthly-limit" type="number" placeholder="Aylık Limit" class="w-full border px-3 py-2 rounded">
+      </div>
+      <div class="mt-4 flex justify-end space-x-2">
+        <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded">İptal</button>
+        <button onclick="submitLimit()" class="bg-blue-600 text-white px-4 py-2 rounded">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api/admin/usage-limits';
+    const JWT = sessionStorage.getItem("admin_jwt");
+
+    async function loadLimits() {
+      const res = await fetch(API + '/', {
+        headers: { 'Authorization': 'Bearer ' + JWT }
+      });
+      const limits = await res.json();
+      const table = document.getElementById("limit-table");
+      table.innerHTML = '';
+      for (let l of limits) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="border px-4 py-2">${l.plan_name}</td>
+          <td class="border px-4 py-2">${l.feature}</td>
+          <td class="border px-4 py-2">${l.daily_limit}</td>
+          <td class="border px-4 py-2">${l.monthly_limit}</td>
+          <td class="border px-4 py-2">
+            <button onclick='editLimit(${JSON.stringify(l)})' class="text-blue-600 font-bold">✏️</button>
+            <button onclick='deleteLimit(${l.id})' class="text-red-600 font-bold ml-2">🗑️</button>
+          </td>`;
+        table.appendChild(row);
+      }
+    }
+
+    function openModal() {
+      document.getElementById("limitModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("limitModal").classList.add("hidden");
+      document.getElementById("limit-id").value = '';
+      document.getElementById("plan-name").value = '';
+      document.getElementById("feature").value = '';
+      document.getElementById("daily-limit").value = '';
+      document.getElementById("monthly-limit").value = '';
+    }
+
+    function editLimit(limit) {
+      document.getElementById("limit-id").value = limit.id;
+      document.getElementById("plan-name").value = limit.plan_name;
+      document.getElementById("feature").value = limit.feature;
+      document.getElementById("daily-limit").value = limit.daily_limit;
+      document.getElementById("monthly-limit").value = limit.monthly_limit;
+      openModal();
+    }
+
+    async function submitLimit() {
+      const id = document.getElementById("limit-id").value;
+      const payload = {
+        plan_name: document.getElementById("plan-name").value,
+        feature: document.getElementById("feature").value,
+        daily_limit: parseInt(document.getElementById("daily-limit").value),
+        monthly_limit: parseInt(document.getElementById("monthly-limit").value)
+      };
+      const method = id ? 'PATCH' : 'POST';
+      const url = id ? `${API}/${id}` : `${API}/`;
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JWT
+        },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        loadLimits();
+        closeModal();
+      } else {
+        alert("Hata oluştu");
+      }
+    }
+
+    async function deleteLimit(id) {
+      if (!confirm("Silmek istiyor musunuz?")) return;
+      await fetch(`${API}/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + JWT }
+      });
+      loadLimits();
+    }
+
+    document.addEventListener("DOMContentLoaded", loadLimits);
+  </script>
+</body>
+</html>

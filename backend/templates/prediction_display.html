@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tahmin Fırsatları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 p-6">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Tahmin Fırsatları</h1>
+        <div class="flex space-x-2 mb-4">
+            <input id="trend-type" type="text" placeholder="Trend tipi" class="border px-3 py-2 rounded">
+            <input id="min-confidence" type="number" placeholder="Min güven" class="border px-3 py-2 rounded">
+            <button onclick="loadPredictions()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Yükle</button>
+        </div>
+        <table class="w-full table-auto border-collapse border border-gray-300">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="border px-2 py-1">Sembol</th>
+                    <th class="border px-2 py-1">Hedef Fiyat</th>
+                    <th class="border px-2 py-1">Beklenen Getiri %</th>
+                    <th class="border px-2 py-1">Güven %</th>
+                    <th class="border px-2 py-1">Durum</th>
+                    <th class="border px-2 py-1">Kalan Süre</th>
+                </tr>
+            </thead>
+            <tbody id="pred-table"></tbody>
+        </table>
+    </div>
+    <script>
+        async function loadPredictions(page = 1) {
+            const trend = document.getElementById('trend-type').value;
+            const conf = document.getElementById('min-confidence').value;
+            const params = new URLSearchParams({page, per_page: 20});
+            if (trend) params.append('trend_type', trend);
+            if (conf) params.append('min_confidence', conf);
+            const res = await fetch('/api/admin/predictions/public?' + params.toString());
+            const data = await res.json();
+            const tbody = document.getElementById('pred-table');
+            tbody.innerHTML = '';
+            if (!data.items) return;
+            for (const p of data.items) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border px-2 py-1">${p.symbol}</td>
+                    <td class="border px-2 py-1">${p.target_price}</td>
+                    <td class="border px-2 py-1">${p.expected_gain_pct}</td>
+                    <td class="border px-2 py-1">${p.confidence_score}</td>
+                    <td class="border px-2 py-1">${p.status}</td>
+                    <td class="border px-2 py-1">${p.remaining_time || '-'}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => loadPredictions());
+    </script>
+</body>
+</html>

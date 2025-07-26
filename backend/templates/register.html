@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block title %}YTDCrypto • Üye Ol{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Sabit arka plan fotoğrafı */
+            background-image: url('https://www.coinkolik.com/wp-content/uploads/2023/12/gunun-one-cikan-kripto-paralari-30-aralik-2023.jpg'); /* Buraya kendi fotoğraf URL'nizi ekleyebilirsiniz */
+            background-size: cover; /* Resmi tüm alanı kaplayacak şekilde ayarla */
+            background-position: center center; /* Resmi ortala */
+            background-attachment: fixed; /* Resmi sabit tut, içerik hareket etsin */
+            background-color: #0d1117; /* Resim yüklenmezse veya saydamlıkta görülecek fallback renk */
+            color: #e2e8f0; /* Açık metin rengi */
+        }
+        .card {
+            background-color: rgba(30, 41, 59, 0.85); /* slate-800'ün opak hali */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #334155; /* slate-700 */
+            backdrop-filter: blur(5px); /* Hafif bulanıklık efekti */
+            color: #e2e8f0; /* Kart içindeki metin rengi */
+        }
+        .card:hover {
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.2);
+        }
+        /* Genel buton base stilleri */
+        .btn-base {
+            padding: 0.75rem 1.5rem; /* px-6 py-3 yerine */
+            font-size: 1rem; /* text-lg yerine */
+            font-weight: 600; /* font-semibold */
+            border: none;
+            border-radius: 9999px; /* rounded-full */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Hafif gölge */
+        }
+        .btn-base:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .btn-base::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn-base:hover::before {
+            left: 100%;
+        }
+        .btn-base:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        /* Ana Degrade Buton Stili (Form içindeki Üye Ol butonu) */
+        .btn-gradient {
+            background: linear-gradient(45deg, #a855f7, #6366f1); /* Mor-İndigo degrade */
+            color: white;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(45deg, #be185d, #a855f7); /* Hover'da renk değişimi */
+        }
+
+        /* input-field sınıfı için doğrudan Tailwind sınıfları */
+        .input-field {
+            margin-top: 0.25rem; /* mt-1 */
+            display: block; /* block */
+            width: 100%; /* w-full */
+            padding-left: 0.75rem; /* px-3 */
+            padding-right: 0.75rem; /* px-3 */
+            padding-top: 0.5rem; /* py-2 */
+            padding-bottom: 0.5rem; /* py-2 */
+            border-width: 1px; /* border */
+            border-color: #475569; /* slate-600 */
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+            outline: none; /* focus:outline-none */
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+        }
+        .input-field:focus {
+            border-color: #818cf8; /* indigo-400 */
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25); /* focus:ring-indigo-500 */
+        }
+        .input-field::placeholder {
+            color: #94a3b8; /* slate-400 */
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #a855f7; /* Mor */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-message {
+            color: #ef4444; /* red-500 */
+            font-size: 0.875rem; /* text-sm */
+            margin-top: 0.25rem; /* mt-1 */
+        }
+        .success-message {
+            color: #10b981; /* emerald-500 */
+            font-size: 0.875rem; /* text-sm */
+            margin-top: 0.25rem; /* mt-1 */
+        }
+        .password-strength-bar {
+            height: 6px;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+            margin-top: 4px;
+        }
+        .strength-0 { background-color: #ef4444; /* red-500 */ }
+        .strength-1 { background-color: #fbbf24; /* amber-400 */ }
+        .strength-2 { background-color: #3b82f6; /* blue-500 */ }
+        .strength-3 { background-color: #10b981; /* emerald-500 */ }
+        .strength-4 { background-color: #059669; /* emerald-600 */ }
+
+        /* Metin renkleri ve bağlantı renkleri koyu tema için ayarlandı */
+        label { color: #cbd5e1; /* slate-300 */ }
+        .text-slate-600 { color: #94a3b8; /* slate-400 */ }
+        .text-teal-600 { color: #22d3ee; /* cyan-400 */ }
+        .hover\:text-teal-800:hover { color: #06b6d4; /* cyan-500 */ }
+
+        .response-api-key-text { color: #e2e8f0; } /* api key text color */
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-screen p-4">
+    <div class="card p-8 sm:p-10 max-w-md w-full">
+        <h2 class="text-3xl font-bold text-white mb-6 text-center">YTDCrypto'ya Üye Ol</h2>
+        <p class="text-sm text-slate-400 mb-6 text-center">Hızlıca bir hesap oluştur ve analizlere başla.</p>
+
+        <form id="register-form" class="space-y-6">
+            <div>
+                <label for="username" class="block text-sm font-medium">Kullanıcı Adı:</label>
+                <input type="text" id="username" name="username" required 
+                       class="input-field"
+                       placeholder="benzersiz_kullanici_adi"
+                       minlength="3" maxlength="20" pattern="^[a-zA-Z0-9_.]+$" title="Sadece harf, sayı, nokta ve alt çizgi içerebilir (3-20 karakter)" autofocus autocomplete="off">
+                <p id="username-error" class="error-message hidden">Geçersiz kullanıcı adı formatı.</p>
+                <p class="text-xs text-slate-500 mt-1">Sadece harf, sayı, nokta ve alt çizgi (3-20 karakter).</p>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium">Şifre:</label>
+                <div class="relative">
+                    <input type="password" id="password" name="password" required 
+                           class="input-field pr-10"
+                           placeholder="Güçlü bir şifre belirle"
+                           minlength="8" autocomplete="off">
+                    <button type="button" id="toggle-password" aria-label="Şifreyi göster veya gizle" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-slate-400">
+                        <span id="password-toggle-icon">👁️</span>
+                    </button>
+                </div>
+                <div id="password-strength-bar" class="password-strength-bar strength-0"></div>
+                <p id="password-error" class="error-message hidden">Şifreniz en az 8 karakter olmalı (büyük/küçük harf, rakam ve sembol içermelidir).</p>
+            </div>
+
+            <div>
+                <label for="confirm-password" class="block text-sm font-medium">Şifre Tekrarı:</label>
+                <input type="password" id="confirm-password" name="confirm_password" required 
+                       class="input-field"
+                       placeholder="Şifrenizi tekrar girin" autocomplete="off">
+                <p id="confirm-password-error" class="error-message hidden">Şifreler eşleşmiyor.</p>
+            </div>
+
+            <div class="flex items-start">
+                <input id="terms-checkbox" type="checkbox" required
+                       class="mt-1 h-4 w-4 text-cyan-400 focus:ring-cyan-500 border-slate-600 rounded">
+                <label for="terms-checkbox" class="ml-2 block text-sm text-slate-300">
+                    <a href="/gizlilik-politikasi.html" class="text-cyan-400 hover:text-cyan-500 font-semibold" target="_blank">Gizlilik Politikası</a> ve 
+                    <a href="/kullanim-kosullari.html" class="text-cyan-400 hover:text-cyan-500 font-semibold" target="_blank">Kullanım Koşulları</a>nı okudum ve kabul ediyorum.
+                </label>
+            </div>
+
+            <div>
+                <button type="submit" id="register-button" class="btn-base btn-gradient w-full py-2 px-4 rounded-md font-semibold flex items-center justify-center gap-2">
+                    <span id="button-text">Üye Ol</span>
+                    <div id="button-loader" class="loader hidden"></div>
+                </button>
+            </div>
+
+            <p id="response-message" class="text-center text-sm hidden"></p>
+            <p class="text-center text-sm text-slate-400 mt-4">Zaten bir hesabın var mı? <a href="giris.html" class="text-cyan-400 hover:text-cyan-500 font-semibold">Giriş Yap</a></p>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+        const BACKEND_BASE_URL = 'http://localhost:5000';
+        const BACKEND_REGISTER_API_URL = `${BACKEND_BASE_URL}/api/auth/register`;
+        const BACKEND_USERNAME_CHECK_API_URL = `${BACKEND_BASE_URL}/api/auth/check-username`;
+
+        const registerForm = document.getElementById('register-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        const registerButton = document.getElementById('register-button');
+        const buttonText = document.getElementById('button-text');
+        const buttonLoader = document.getElementById('button-loader');
+        const responseMessage = document.getElementById('response-message');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+
+        const usernameError = document.getElementById('username-error');
+        const passwordStrengthBar = document.getElementById('password-strength-bar');
+        const passwordError = document.getElementById('password-error');
+        const confirmPasswordError = document.getElementById('confirm-password-error');
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordToggleIcon = document.getElementById('password-toggle-icon');
+
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            confirmPasswordInput.setAttribute('type', type); 
+            passwordToggleIcon.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)) strength++;
+
+            passwordStrengthBar.style.width = `${(strength / 5) * 100}%`;
+            passwordStrengthBar.className = `password-strength-bar strength-${strength}`;
+
+            passwordError.classList.add('hidden');
+        });
+
+        confirmPasswordInput.addEventListener('input', () => {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordError.classList.remove('hidden');
+                confirmPasswordInput.classList.add('border-red-500');
+            } else {
+                confirmPasswordError.classList.add('hidden');
+                confirmPasswordInput.classList.remove('border-red-500');
+            }
+        });
+
+        usernameInput.addEventListener('blur', async () => {
+            const username = usernameInput.value;
+            const usernamePattern = /^[a-zA-Z0-9_.]+$/;
+            if (username.length >= 3 && username.length <= 20 && usernamePattern.test(username)) {
+                usernameError.classList.add('hidden');
+                usernameInput.classList.remove('border-red-500');
+
+                try {
+                    const response = await fetch(`${BACKEND_USERNAME_CHECK_API_URL}?username=${username}`);
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`HTTP Hata: ${response.status} - ${errorText.substring(0, 100)}...`);
+                    }
+                    const data = await response.json();
+
+                    if (!data.available) {
+                        usernameError.textContent = "Bu kullanıcı adı zaten alınmış.";
+                        usernameError.classList.remove('hidden');
+                        usernameInput.classList.add('border-red-500');
+                    } else {
+                        usernameError.classList.add('hidden');
+                        usernameInput.classList.remove('border-red-500');
+                    }
+                } catch (error) {
+                    console.error('Kullanıcı adı kontrolü sırasında hata:', error);
+                    usernameError.textContent = 'Kullanıcı adı kontrol edilemedi. Lütfen backend sunucusunun çalıştığından emin olun ve konsolu kontrol edin.';
+                    usernameError.classList.remove('hidden');
+                    usernameInput.classList.add('border-red-500');
+                }
+            } else if (username.length > 0) {
+                usernameError.classList.remove('hidden');
+                usernameInput.classList.add('border-red-500');
+            }
+        });
+
+        function validateForm() {
+            let isValid = true;
+            responseMessage.classList.add('hidden');
+
+            const username = usernameInput.value;
+            const usernamePattern = /^[a-zA-Z0-9_.]+$/;
+            if (username.length < 3 || username.length > 20 || !usernamePattern.test(username)) {
+                usernameError.classList.remove('hidden');
+                usernameInput.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                usernameError.classList.add('hidden');
+                usernameInput.classList.remove('border-red-500');
+            }
+
+            const password = passwordInput.value;
+            const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+            if (!strongPasswordRegex.test(password)) {
+                passwordError.classList.remove('hidden');
+                passwordInput.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                passwordError.classList.add('hidden');
+                passwordInput.classList.remove('border-red-500');
+            }
+
+            if (password !== confirmPasswordInput.value) {
+                confirmPasswordError.classList.remove('hidden');
+                confirmPasswordInput.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                confirmPasswordError.classList.add('hidden');
+                confirmPasswordInput.classList.remove('border-red-500');
+            }
+
+            if (!termsCheckbox.checked) {
+                responseMessage.textContent = "Üye olmak için Gizlilik Politikası ve Kullanım Koşullarını kabul etmelisiniz.";
+                responseMessage.classList.add('text-red-600', 'block');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                responseMessage.textContent = "Lütfen formdaki hataları düzeltin.";
+                responseMessage.classList.add('text-red-600', 'block');
+                responseMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            registerButton.disabled = true;
+            buttonText.textContent = 'İşleniyor...';
+            buttonLoader.classList.remove('hidden');
+            responseMessage.classList.add('hidden');
+            responseMessage.classList.remove('text-green-600', 'text-red-600');
+
+            try {
+                const response = await fetch(BACKEND_REGISTER_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username, password: password })
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP Hata: ${response.status} - ${errorText.substring(0, 100)}...`);
+                }
+                const data = await response.json();
+
+                if (response.ok) {
+                    responseMessage.innerHTML = `
+                        <span class="success-message">Başarılı! Hesabınız oluşturuldu. API Anahtarınız: </span>
+                        <span id="display-api-key" class="font-semibold select-all response-api-key-text break-all">${data.api_key}</span>
+                        <button type="button" id="copy-api-key-button" class="ml-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-md text-xs font-semibold">📋 Kopyala</button>
+                        <br><span class="success-message">Lütfen bu anahtarı kaydedin ve giriş yapmak için kullanın. 3 saniye içinde giriş sayfasına yönlendiriliyorsunuz.</span>
+                    `;
+                    responseMessage.classList.remove('hidden');
+                    responseMessage.classList.remove('text-red-600');
+                    responseMessage.classList.add('block');
+
+                    document.getElementById('copy-api-key-button').addEventListener('click', () => {
+                        navigator.clipboard.writeText(data.api_key)
+                            .then(() => {
+                                alert('API anahtarı kopyalandı!');
+                            })
+                            .catch(err => {
+                                console.error('Kopyalama başarısız:', err);
+                                alert('API anahtarını kopyalarken bir hata oluştu.');
+                            });
+                    });
+
+                    sessionStorage.setItem('ytdcrypto_username', username);
+                    sessionStorage.setItem('ytdcrypto_api_key', data.api_key);
+
+                    if (data.subscription_level) {
+                        sessionStorage.setItem('ytdcrypto_subscription_level', data.subscription_level);
+                    }
+                    if (data.subscription_end) {
+                        const endDate = new Date(data.subscription_end);
+                        const now = new Date();
+                        const diffInDays = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+                        sessionStorage.setItem('ytdcrypto_trial_remaining_days', diffInDays);
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = window.location.origin + '/giris.html';
+                    }, 3000); 
+                } else {
+                    let errorMessage = data.error || 'Bilinmeyen bir hata oluştu.';
+                    if (response.status === 409) {
+                        errorMessage = `Bu kullanıcı adı (${username}) zaten kullanımda. Lütfen başka bir tane seçin.`;
+                    } else if (response.status >= 500) {
+                        errorMessage = 'Sunucuyla bağlantı sağlanamadı veya sunucu tarafında bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.';
+                    }
+                    responseMessage.textContent = `Hata: ${errorMessage}`;
+                    responseMessage.classList.add('text-red-600', 'block');
+                }
+            } catch (error) {
+                console.error('Kayıt sırasında bir ağ hatası oluştu:', error);
+                responseMessage.textContent = 'Bir ağ hatası oluştu. Lütfen backend sunucusunun çalıştığından emin olun.';
+                responseMessage.classList.add('text-red-600', 'block');
+            } finally {
+                registerButton.disabled = false;
+                buttonText.textContent = 'Üye Ol';
+                buttonLoader.classList.add('hidden');
+            }
+        });
+</script>
+{% endblock %}

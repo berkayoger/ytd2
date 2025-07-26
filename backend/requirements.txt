@@ -1,0 +1,29 @@
+# Flask Core
+flask
+python-dotenv
+
+# Veritabanı (PostgreSQL) ve ORM
+psycopg2-binary
+Flask-SQLAlchemy
+
+# Arka Plan Görevleri (Celery) ve Mesaj Kuyruğu (Redis)
+celery
+redis
+
+# Ödeme Sistemi (Iyzico)
+iyzipay
+
+# Kimlik Doğrulama (JWT)
+Flask-JWT-Extended
+
+# E-posta Gönderimi
+Flask-Mail
+
+# Web Sunucusu (Opsiyonel ama önerilir)
+gunicorn
+Flask-Cors
+Flask-Limiter
+flask_socketio
+loguru
+requests
+psutil

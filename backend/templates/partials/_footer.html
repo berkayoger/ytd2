@@ -1,0 +1,91 @@
+{# backend/templates/partials/_footer.html #}
+<footer role="contentinfo" class="footer bg-dark text-light py-5">
+  <div class="container">
+    <div class="row">
+      <!-- Marka & Kısa Açıklama -->
+      <div class="col-12 col-md-4 mb-4">
+        <a href="{{ url_for('core.index') }}" class="d-inline-block mb-2">
+          <img src="{{ url_for('static', filename='images/logo-footer.svg') }}" alt="YTD Kripto Logo" class="footer-logo" />
+        </a>
+        <p class="small">
+          Yatırım kararlarınızı veri odaklı destekliyoruz.
+        </p>
+      </div>
+
+      <!-- Ürün/Hizmet -->
+      <div class="col-6 col-md-2 mb-4">
+        <h5 class="footer-heading">Ürün</h5>
+        <ul class="list-unstyled footer-links">
+          <li><a href="{{ url_for('core.index') }}">Anasayfa</a></li>
+          <li><a href="{{ url_for('api.analysis', coin='bitcoin') }}">Analizler</a></li>
+          <li><a href="{{ url_for('core.dashboard') }}">Dashboard</a></li>
+        </ul>
+      </div>
+
+      <!-- Şirket -->
+      <div class="col-6 col-md-2 mb-4">
+        <h5 class="footer-heading">Şirket</h5>
+        <ul class="list-unstyled footer-links">
+          <li><a href="{{ url_for('core.about') }}">Hakkımızda</a></li>
+          <li><a href="{{ url_for('core.blog') }}">Blog</a></li>
+          <li><a href="{{ url_for('core.careers') }}">Kariyer</a></li>
+        </ul>
+      </div>
+
+      <!-- Destek -->
+      <div class="col-6 col-md-2 mb-4">
+        <h5 class="footer-heading">Destek</h5>
+        <ul class="list-unstyled footer-links">
+          <li><a href="{{ url_for('core.faq') }}">SSS</a></li>
+          <li><a href="{{ url_for('core.contact') }}">İletişim</a></li>
+          <li><a href="{{ url_for('core.help') }}">Yardım Merkezi</a></li>
+        </ul>
+      </div>
+
+      <!-- Sosyal Medya -->
+      <div class="col-6 col-md-2 mb-4">
+        <h5 class="footer-heading">Bizi Takip Edin</h5>
+        <ul class="list-inline social-icons">
+          <li class="list-inline-item">
+            <a href="https://twitter.com/YourHandle" aria-label="Twitter">
+              <i class="fab fa-twitter fa-lg"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://t.me/YourChannel" aria-label="Telegram">
+              <i class="fab fa-telegram fa-lg"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://linkedin.com/company/YourCompany" aria-label="LinkedIn">
+              <i class="fab fa-linkedin fa-lg"></i>
+            </a>
+          </li>
+          <li class="list-inline-item">
+            <a href="https://youtube.com/YourChannel" aria-label="YouTube">
+              <i class="fab fa-youtube fa-lg"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="border-secondary" />
+
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2 mb-md-0">
+        <ul class="list-inline mb-0 legal-links">
+          <li class="list-inline-item"><a href="{{ url_for('core.privacy') }}">Gizlilik Politikası</a></li>
+          <li class="list-inline-item"><a href="{{ url_for('core.cookies') }}">Çerez Politikası</a></li>
+          <li class="list-inline-item"><a href="{{ url_for('core.terms') }}">Kullanım Şartları</a></li>
+        </ul>
+      </div>
+      <div class="col-md-6 text-md-right">
+        <small class="text-muted">
+          © {{ config.SITE_YEAR or 2025 }} YTD Kripto. Tüm hakları saklıdır.  
+          Versiyon {{ config.APP_VERSION or '1.0.0' }}
+        </small>
+      </div>
+    </div>
+  </div>
+</footer>

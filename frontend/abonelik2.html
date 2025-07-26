@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>YTDCrypto – Abonelik Planları & Ödeme</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .plan-card {
+      background: linear-gradient(135deg,#1e293b 80%,#6366f1 130%);
+      transition: all .3s ease-in-out;
+      border:1px solid #334155;
+      position:relative;
+    }
+    .plan-card.selected {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 10px 40px rgba(129,140,248,.2);
+      border-color:#818cf8;
+    }
+    .plan-badge {
+      position:absolute; top:-.75rem; left:50%; transform:translateX(-50%);
+      background:#6366f1;color:#fff;padding:.25rem .75rem;border-radius:9999px;
+      font-size:.75rem;font-weight:700;
+    }
+    .disabled-feature { opacity:.5; text-decoration:line-through; }
+    .check-icon { color:#22c55e; width:20px; height:20px; flex-shrink:0; }
+    .x-icon     { color:#ef4444; width:20px; height:20px; flex-shrink:0; }
+    .btn-gradient {
+      background: linear-gradient(45deg,#a855f7,#6366f1);
+      transition: all .3s ease;
+    }
+    .btn-gradient:hover { box-shadow:0 8px 25px rgba(99,102,241,.5); transform:scale(1.05); }
+    .btn-gradient:disabled {
+      background:#475569; opacity:.7; cursor:not-allowed;
+    }
+    .spinner {
+      border:2px solid rgba(255,255,255,.3);
+      border-radius:50%; border-top-color:#fff;
+      width:16px; height:16px; animation:spin 1s linear infinite;
+    }
+    @keyframes spin{ to{transform:rotate(360deg);} }
+    @media(max-width:640px){
+      .plan-card{padding:2rem 1rem;}
+      .btn-gradient{padding:.75rem 1rem;font-size:.9rem;}
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-200 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-slate-950/90 py-4 sticky top-0 z-10 shadow-lg">
+    <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
+      <h1 class="text-2xl font-extrabold text-white tracking-wider">YTDCrypto</h1>
+      <nav class="space-x-4">
+        <a href="index.html" class="hover:text-indigo-400">Ana Sayfa</a>
+        <a href="dashboard.html" class="hover:text-indigo-400">Analiz Paneli</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-grow py-12">
+    <div class="max-w-6xl mx-auto px-4">
+
+      <h2 class="text-4xl sm:text-5xl font-extrabold text-white mb-8 text-center">Abonelik Planları</h2>
+      <p class="text-lg text-slate-400 mb-12 text-center">İhtiyacınıza en uygun planı hemen seçin.</p>
+
+      <div id="plans" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Plan Kartları (Backend’den fiyat/özellik çekecek) -->
+        <div class="plan-card p-8 rounded-2xl shadow-xl" data-plan="basic" data-price="0.00">
+          <h3 class="text-2xl font-bold text-indigo-300 mb-2 tracking-widest text-center">BASIC</h3>
+          <div class="flex items-end justify-center gap-1 mb-1">
+            <span class="price-main text-5xl font-extrabold text-white">$0</span>
+            <span class="price-frac text-2xl font-bold text-white">.00</span>
+            <span class="text-base text-slate-400 font-semibold mb-1">/ay</span>
+          </div>
+          <div class="mb-4 text-slate-400 text-center min-h-[48px]">Yükleniyor…</div>
+          <ul class="feature-list mb-6 space-y-2 text-base"></ul>
+          <button class="btn-gradient w-full py-3 rounded-full font-semibold select-plan-btn" disabled>Yükleniyor...</button>
+        </div>
+
+        <div class="plan-card p-8 rounded-2xl shadow-xl" data-plan="advanced" data-price="0.00">
+          <h3 class="text-2xl font-bold text-indigo-300 mb-2 tracking-widest text-center">ADVANCED</h3>
+          <div class="flex items-end justify-center gap-1 mb-1">
+            <span class="price-main text-5xl font-extrabold text-white">$0</span>
+            <span class="price-frac text-2xl font-bold text-white">.00</span>
+            <span class="text-base text-slate-400 font-semibold mb-1">/ay</span>
+          </div>
+          <div class="mb-4 text-slate-400 text-center min-h-[48px]">Yükleniyor…</div>
+          <ul class="feature-list mb-6 space-y-2 text-base"></ul>
+          <button class="btn-gradient w-full py-3 rounded-full font-semibold select-plan-btn" disabled>Yükleniyor...</button>
+        </div>
+
+        <div class="plan-card p-8 rounded-2xl shadow-xl" data-plan="premium" data-price="0.00">
+          <h3 class="text-2xl font-bold text-indigo-300 mb-2 tracking-widest text-center">PREMIUM</h3>
+          <div class="flex items-end justify-center gap-1 mb-1">
+            <span class="price-main text-5xl font-extrabold text-white">$0</span>
+            <span class="price-frac text-2xl font-bold text-white">.00</span>
+            <span class="text-base text-slate-400 font-semibold mb-1">/ay</span>
+          </div>
+          <div class="mb-4 text-slate-400 text-center min-h-[48px]">Yükleniyor…</div>
+          <ul class="feature-list mb-6 space-y-2 text-base"></ul>
+          <button class="btn-gradient w-full py-3 rounded-full font-semibold select-plan-btn" disabled>Yükleniyor...</button>
+        </div>
+      </div>
+
+      <!-- Ödeme Bölümü -->
+      <div id="payment-section" class="mt-12 flex flex-col items-center hidden">
+        <p class="text-xl font-semibold text-white mb-4">
+          Seçilen Plan: <span id="display-plan-name" class="text-indigo-400"></span> —
+          <span id="display-plan-price" class="text-indigo-400"></span>
+        </p>
+        <input type="text" id="promo-code-input"
+               placeholder="Promosyon kodunuz varsa girin"
+               class="mt-2 bg-slate-800 border border-slate-700 rounded-md px-4 py-2
+                      text-slate-200 placeholder-slate-500 focus:ring-2
+                      focus:ring-indigo-500 focus:outline-none w-full max-w-sm"/>
+        <button id="pay-button"
+                class="btn-gradient mt-4 flex items-center justify-center px-8 py-3 rounded-full font-bold"
+                disabled>
+          <span id="pay-button-text">Ödeme Yap</span>
+          <div id="pay-button-spinner" class="spinner hidden ml-2"></div>
+        </button>
+        <div id="iyzico-form-container"
+             class="mt-8 bg-slate-800 p-6 rounded-lg border border-slate-700
+                    hidden w-full max-w-lg"></div>
+        <p id="response-message" class="text-center text-sm mt-4 hidden"></p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 text-white py-6 text-center">
+    <div class="max-w-6xl mx-auto">© 2024 YTDCrypto. Tüm Hakları Saklıdır.</div>
+  </footer>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+
+      const BACKEND = 'http://localhost:5000';
+      const PLAN_API   = BACKEND + '/api/plans/prices';
+      const PAY_API    = BACKEND + '/api/payment/initiate';
+      const API_KEY    = sessionStorage.getItem('ytdcrypto_api_key');
+
+      const cards      = document.querySelectorAll('.plan-card');
+      const paySection = document.getElementById('payment-section');
+      const dispName   = document.getElementById('display-plan-name');
+      const dispPrice  = document.getElementById('display-plan-price');
+      const promoInput = document.getElementById('promo-code-input');
+      const payBtn     = document.getElementById('pay-button');
+      const payText    = document.getElementById('pay-button-text');
+      const paySpin    = document.getElementById('pay-button-spinner');
+      const iyziCont   = document.getElementById('iyzico-form-container');
+      const respMsg    = document.getElementById('response-message');
+
+      let selectedPlan = null;
+
+      function notify(msg, type='error') {
+        respMsg.textContent = msg;
+        respMsg.className = 'text-center text-sm mt-4 ' + (type==='success'? 'text-green-400':'text-red-400');
+        respMsg.classList.remove('hidden');
+      }
+
+      // 1) Planları yükle
+      try {
+        const res = await fetch(PLAN_API);
+        if(!res.ok) throw '';
+        const data = await res.json();
+        cards.forEach(card => {
+          const plan = card.dataset.plan.toUpperCase();
+          const { price, tagline, features, popular } = data[plan];
+          // price
+          const [m,f] = parseFloat(price).toFixed(2).split('.');
+          card.querySelector('.price-main').textContent = '$'+m;
+          card.querySelector('.price-frac').textContent = '.'+f;
+          card.dataset.price = price;
+          // tagline
+          card.querySelector('div.min-h-[48px]').textContent = tagline;
+          // badge
+          if(popular) {
+            const b = document.createElement('div');
+            b.className = 'plan-badge'; b.textContent='EN POPÜLER';
+            card.append(b);
+          }
+          // features
+          const ul = card.querySelector('.feature-list');
+          ul.innerHTML = '';
+          features.forEach(fv => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center gap-2' + (fv.available?'':' disabled-feature');
+            li.innerHTML = `<svg data-lucide="${fv.available?'check':'x'}" class="${fv.available?'check-icon':'x-icon'}"></svg>${fv.text}`;
+            ul.append(li);
+          });
+          // button
+          const btn = card.querySelector('.select-plan-btn');
+          btn.disabled = false;
+          btn.textContent = 'Planı Seç';
+        });
+        lucide.createIcons();
+      } catch(e) {
+        notify('Planlar yüklenemedi, lütfen sayfayı yenileyin.');
+      }
+
+      // 2) Seçim
+      cards.forEach(card=>{
+        card.addEventListener('click',()=>{
+          cards.forEach(c=>c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedPlan = card.dataset.plan;
+          dispName.textContent = selectedPlan.toUpperCase();
+          dispPrice.textContent = '$'+ parseFloat(card.dataset.price).toFixed(2);
+          paySection.classList.remove('hidden');
+          payBtn.disabled = false;
+          respMsg.classList.add('hidden');
+        });
+      });
+
+      // 3) Ödeme
+      payBtn.addEventListener('click', async ()=>{
+        if(!selectedPlan){ notify('Plan seçin.'); return; }
+        if(!API_KEY){ notify('Önce giriş yapın.'); return; }
+
+        payBtn.disabled=true; payText.textContent='Yönlendiriliyor'; paySpin.classList.remove('hidden');
+        respMsg.classList.add('hidden'); iyziCont.classList.add('hidden');
+
+        try {
+          const r = await fetch(PAY_API,{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json',
+              'X-API-KEY': API_KEY
+            },
+            body: JSON.stringify({
+              plan: selectedPlan,
+              promo_code: promoInput.value.trim()||null
+            })
+          });
+          const d = await r.json();
+          if(!r.ok) throw new Error(d.error||'Başlatılamadı');
+          if(d.payment_form_content){
+            iyziCont.innerHTML = d.payment_form_content;
+            iyziCont.classList.remove('hidden');
+            lucide.createIcons();
+            const s = iyziCont.querySelector('script');
+            if(s) eval(s.textContent);
+          } else if(d.payment_page_url) {
+            window.location.href = d.payment_page_url;
+          } else {
+            throw new Error('Ödeme adımı eksik.');
+          }
+        } catch(err){
+          notify(err.message||'Hata oluştu.');
+          payBtn.disabled=false; payText.textContent='Ödeme Yap'; paySpin.classList.add('hidden');
+        }
+      });
+    });
+  </script>
+
+  <script>
+  async function loadPlans() {
+      const res = await fetch("/api/subscriptions");
+      const plans = await res.json();
+      const container = document.getElementById("plans");
+
+      for (const plan of plans) {
+          const card = document.createElement("div");
+          card.className = "bg-white border rounded p-4 shadow";
+
+          card.innerHTML = `
+              <h3 class="text-xl font-bold text-indigo-700">${plan.name}</h3>
+              <p class="text-2xl font-semibold mt-2">${plan.price == 0 ? "Ücretsiz" : plan.price + " TL/ay"}</p>
+              <ul class="mt-2 list-disc list-inside text-sm text-gray-700">
+                  ${plan.features.map(f => `<li>${f}</li>`).join("")}
+              </ul>
+          `;
+          container.appendChild(card);
+      }
+  }
+
+  document.addEventListener("DOMContentLoaded", loadPlans);
+  </script>
+</body>
+</html>

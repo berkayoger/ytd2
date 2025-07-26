@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Sayfa Başlığı (Diğer templateler tarafından üzerine yazılabilir) -->
+    <title>{% block title %}YTDCrypto{% endblock %}</title>
+    
+    <!-- CSS Kütüphaneleri -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bootstrap 5 CSS (Eğer footer gibi bileşenler için gerekiyorsa) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome (İkonlar için) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    
+    <!-- Özel Stil Dosyası -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Ekstra Head Blok (Sayfa bazlı stil eklemek için) -->
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-dark text-light">
+
+    <!-- Header Bölümü -->
+    <header>
+        {% include 'partials/_header.html' %}
+    </header>
+
+    <!-- Ana İçerik Bölümü -->
+    <main class="container my-5">
+        {% block content %}
+        <!-- Diğer templateler bu bloğun içini dolduracak -->
+        {% endblock %}
+    </main>
+
+    <!-- Footer Bölümü -->
+    <footer>
+        {% include 'partials/_footer.html' %}
+    </footer>
+
+    <!-- JavaScript Kütüphaneleri -->
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Özel Script Dosyası -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- Ekstra Script Blok (Sayfa bazlı script eklemek için) -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

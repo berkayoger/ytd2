@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tahminler | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .trend-badge {
+        font-size: 0.75rem;
+        background-color: #e0e7ff;
+        color: #3730a3;
+        padding: 2px 6px;
+        border-radius: 0.25rem;
+        margin-left: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 p-6">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Tahmin Filtreleme</h1>
+    <div class="flex flex-wrap gap-2 mb-4">
+      <input id="filter-symbol" type="text" placeholder="Sembol" class="border px-3 py-2 rounded">
+      <select id="filter-trend" class="border px-3 py-2 rounded">
+        <option value="">Trend tipi</option>
+        <option value="short_term">short_term</option>
+        <option value="long_term">long_term</option>
+      </select>
+      <input id="filter-confidence" type="number" step="0.1" placeholder="Min güven" class="border px-3 py-2 rounded">
+      <input id="filter-duration" type="text" placeholder="Süre aralığı (örn. 30-60)" class="border px-3 py-2 rounded">
+      <button onclick="loadFilteredPredictions()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Filtrele</button>
+    </div>
+    <div id="strategic-predictions" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+<script>
+async function loadFilteredPredictions(page = 1) {
+    const symbolInput = document.getElementById("filter-symbol").value.trim().toUpperCase();
+    const trend = document.getElementById("filter-trend").value;
+    const conf = document.getElementById("filter-confidence").value;
+    const duration = document.getElementById("filter-duration").value;
+
+    const params = new URLSearchParams({ page, per_page: 20 });
+
+    if (symbolInput) {
+        params.append("symbol", symbolInput);
+    }
+    if (trend) {
+        params.append("trend_type", trend);
+    }
+    if (conf) {
+        params.append("min_confidence", conf);
+    }
+    if (duration) {
+        params.append("duration_range", duration);
+    }
+
+    const res = await fetch('/api/admin/predictions/public?' + params.toString());
+    const data = await res.json();
+    const container = document.getElementById("strategic-predictions");
+    container.innerHTML = "";
+
+    for (const item of (data.items || [])) {
+        const card = document.createElement("div");
+        card.className = "bg-white rounded shadow p-4 border border-gray-300";
+        card.innerHTML = `
+            <div class="flex items-center mb-2">
+              <img src="https://cryptoicon-api.vercel.app/api/icon/${item.symbol.toLowerCase()}" alt="${item.symbol}" class="w-6 h-6 mr-2">
+              <h3 class="text-lg font-bold text-indigo-700">${item.symbol}</h3>
+              <span class="trend-badge">${item.trend_type}</span>
+            </div>
+            <p><strong>Beklenen Getiri:</strong> %${item.expected_gain_pct}</p>
+            <p><strong>Getiri Süresi:</strong> ${item.expected_gain_days}</p>
+            <p><strong>Güven:</strong> %${Math.round((item.confidence || 0) * 100)}</p>
+            <p class="text-sm text-gray-600 mt-2">${item.description}</p>
+            <p class="text-xs text-gray-400 mt-1">📅 ${new Date(item.created_at).toLocaleString()}</p>
+        `;
+        container.appendChild(card);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadFilteredPredictions();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+{% block title %}Ana Sayfa - YTDCrypto{% endblock %}
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero-section text-white py-20 px-4 text-center">
+        <div class="hero-glow"></div>
+        <div class="container mx-auto max-w-4xl relative z-10">
+            <h2 class="text-4xl sm:text-6xl font-extrabold leading-tight mb-6">
+                Kripto Dünyasını <br class="sm:hidden"> Yapay Zeka ile Keşfedin.
+            </h2>
+            <p class="text-lg sm:text-xl mb-10 opacity-80 max-w-2xl mx-auto">
+                Bilinçli kararlar almak için güvenilir analizler, gerçek zamanlı veriler ve kişiselleştirilmiş AI önerileri.
+            </p>
+            <a href="{{ url_for('auth.register') }}" class="btn-gradient inline-block !text-xl">Hemen Ücretsiz Kaydol</a>
+        </div>
+    </section>
+
+    <!-- Live Prices Section (Simulated) -->
+    <section class="py-16 px-4 section-bg-dark-1">
+        <div class="container mx-auto">
+            <h2 class="section-heading">Canlı Piyasa Verileri</h2>
+            <div id="live-prices-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Canlı kripto fiyat kartları buraya JS ile yüklenecek -->
+            </div>
+        </div>
+    </section>
+
+  <!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTDCrypto - Gelişmiş Kripto Analiz Platformu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0f0f23 100%);
+        }
+        
+        .feature-card {
+            background: rgba(30, 41, 59, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            background: rgba(30, 41, 59, 0.25);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+        
+        .section-heading {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4rem;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            position: relative;
+        }
+        
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 2px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .floating-circle:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-circle:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 15%;
+            animation-delay: -2s;
+        }
+        
+        .floating-circle:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .section-heading {
+                font-size: 2rem;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 0 1rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+    </div>
+    
+    <!-- Features Section -->
+    <section class="py-20 px-4 relative">
+        <div class="container mx-auto">
+            <h2 class="section-heading">Neden YTDCrypto Fark Yaratır?</h2>
+            <div class="grid-container">
+                <!-- Feature 1: Gelişmiş Analizler -->
+                <div class="feature-card">
+                    <span class="feature-icon pulse-animation">📈</span>
+                    <h3 class="text-xl font-semibold text-white mb-3">Gelişmiş Teknik Analizler</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        Piyasanın derinliklerine inin. Güncel fiyat hareketlerini, RSI, SMA gibi temel teknik göstergeleri ve işlem hacimlerini detaylı grafiklerle takip ederek bilinçli kararlar alın. Verilerimizle piyasa trendlerini anında yakalayın.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-600">
+                        <span class="text-sm text-blue-400 font-medium">Teknik Göstergeler • Grafik Analizi</span>
+                    </div>
+                </div>
+                
+                <!-- Feature 2: AI Destekli Tahminler -->
+                <div class="feature-card">
+                    <span class="feature-icon pulse-animation">🧠</span>
+                    <h3 class="text-xl font-semibold text-white mb-3">Yapay Zeka Destekli Tahminler</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        Geleceği tahmin etmeye bir adım daha yaklaşın. Güçlü Prophet modelimizle geçmiş verilere dayanarak potansiyel fiyat hareketlerini tahmin ediyor ve bu tahminleri detaylı yorumlarla sunuyoruz. Yatırımlarınızı geleceğe göre şekillendirin.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-600">
+                        <span class="text-sm text-purple-400 font-medium">Prophet Model • AI Tahminleri</span>
+                    </div>
+                </div>
+                
+                <!-- Feature 3: Kişiselleştirilmiş Öneriler -->
+                <div class="feature-card">
+                    <span class="feature-icon pulse-animation">💬</span>
+                    <h3 class="text-xl font-semibold text-white mb-3">Kişiselleştirilmiş Yatırım Önerileri</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        Yatırımcı profilinize (agresif, orta, temkinli) ve güncel piyasa koşullarına özel olarak hazırlanmış, Büyük Dil Modelleri (LLM) tarafından desteklenen net kararlar ve anlaşılır açıklamalar alın. Kripto piyasasında yolunuzu kolayca bulun.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-600">
+                        <span class="text-sm text-green-400 font-medium">LLM Destekli • Kişisel Profil</span>
+                    </div>
+                </div>
+                
+                <!-- Feature 4: Güvenli & Hızlı -->
+                <div class="feature-card">
+                    <span class="feature-icon pulse-animation">🔒</span>
+                    <h3 class="text-xl font-semibold text-white mb-3">Üst Düzey Güvenlik ve Hız</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        Verilerinizin güvenliği bizim önceliğimizdir. Güçlü şifreleme ve yetkilendirme mekanizmalarıyla kişisel bilgileriniz daima koruma altındadır. Ayrıca, optimize edilmiş altyapımız sayesinde analizlerinizi anında elinizde bulursunuz.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-600">
+                        <span class="text-sm text-red-400 font-medium">256-bit Şifreleme • Hızlı Altyapı</span>
+                    </div>
+                </div>
+                
+                <!-- Feature 5: Otomatik Güncellemeler -->
+                <div class="feature-card">
+                    <span class="feature-icon pulse-animation">🔄</span>
+                    <h3 class="text-xl font-semibold text-white mb-3">Kesintisiz Otomatik Güncellemeler</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        Piyasa sürekli değişirken, siz daima güncel kalın. Celery Beat tarafından otomatik olarak tetiklenen arka plan analizlerimiz sayesinde, en yeni verilerle beslenen analiz raporlarınız her zaman hazır ve günceldir.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-600">
+                        <span class="text-sm text-orange-400 font-medium">Celery Beat • Otomatik Sync</span>
+                    </div>
+                </div>
+                
+                <!-- Feature 6: Kolay Entegrasyon -->
+                <div class="feature-card">
+                    <span class="feature-icon pulse-animation">🌐</span>
+                    <h3 class="text-xl font-semibold text-white mb-3">Esnek API Entegrasyonu</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        Kendi projelerinizi veya uygulamalarınızı mı geliştiriyorsunuz? YTDCrypto'nun güçlü ve iyi belgelenmiş API'leri sayesinde, analiz yeteneklerimizi kendi sistemlerinize sorunsuz bir şekilde entegre edebilir, kripto verilerinizden en iyi şekilde yararlanabilirsiniz.
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-slate-600">
+                        <span class="text-sm text-cyan-400 font-medium">RESTful API • Detaylı Dokümantasyon</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Add intersection observer for animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Initially hide cards and observe them
+        document.querySelectorAll('.feature-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `opacity 0.4s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+            observer.observe(card);
+        });
+
+        // Add click interaction for cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    card.style.transform = '';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
+
+    <!-- How It Works Section -->
+    <section class="py-16 px-4 section-bg-dark-1">
+        <div class="container mx-auto">
+            <h2 class="section-heading">Nasıl Başlarsınız?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <!-- Step 1 -->
+                <div class="p-6">
+                    <span class="text-5xl font-extrabold text-violet-500">1.</span>
+                    <h3 class="text-xl font-semibold text-white mt-4 mb-2">Hesap Oluşturun</h3>
+                    <p class="text-slate-400">Hızlı ve güvenli bir şekilde YTDCrypto üyeliğinizi başlatın. Sadece birkaç adımda API anahtarınızı alın.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="p-6">
+                    <span class="text-5xl font-extrabold text-violet-500">2.</span>
+                    <h3 class="text-xl font-semibold text-white mt-4 mb-2">Piyasayı Analiz Edin</h3>
+                    <p class="text-slate-400">Gelişmiş panelimiz üzerinden veya API'miz aracılığıyla istediğiniz kripto paralar için derinlemesine AI analizleri alın.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="p-6">
+                    <span class="text-5xl font-extrabold text-violet-500">3.</span>
+                    <h3 class="text-xl font-semibold text-white mt-4 mb-2">Bilinçli Kararlar Alın</h3>
+                    <p class="text-slate-400">Yapay zeka destekli sinyaller, gelecek tahminleri ve açıklayıcı yorumlarla portföyünüzü güçlendirin.</p>
+                </div>
+            </div>
+            <div class="text-center mt-12">
+                <a href="{{ url_for('auth.register') }}" class="btn-gradient inline-block !text-xl">Hemen Kaydolun</a>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

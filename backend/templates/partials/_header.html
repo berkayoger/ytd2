@@ -1,0 +1,63 @@
+{# backend/templates/partials/_header.html #}
+<header class="header-bg py-4 sticky top-0 z-50">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="{{ url_for('core.index') }}" class="text-2xl sm:text-3xl font-extrabold text-white hover:text-gray-200 transition">
+      YTD<span class="text-violet-400">Crypto</span>
+    </a>
+
+    <!-- Desktop Menü -->
+    <nav class="hidden md:flex space-x-6">
+      <a href="{{ url_for('core.index') }}" class="text-gray-200 hover:text-white transition">Ana Sayfa</a>
+      <a href="{{ url_for('api.docs') }}" class="text-gray-200 hover:text-white transition">API Docs</a>
+      <a href="{{ url_for('core.about') }}" class="text-gray-200 hover:text-white transition">Hakkımızda</a>
+      <a href="{{ url_for('core.contact') }}" class="text-gray-200 hover:text-white transition">İletişim</a>
+    </nav>
+
+    <!-- Üye/Giriş Butonları -->
+    <div class="hidden md:flex space-x-4">
+      <a href="{{ url_for('auth.register') }}"
+         class="px-4 py-2 border border-violet-400 text-violet-400 rounded hover:bg-violet-400 hover:text-white transition">
+        Üye Ol
+      </a>
+      <a href="{{ url_for('auth.login') }}"
+         class="px-4 py-2 bg-violet-400 text-white rounded hover:bg-violet-500 transition">
+        Giriş Yap
+      </a>
+    </div>
+
+    <!-- Mobil Menü Butonu -->
+    <button id="mobile-toggle" class="md:hidden text-gray-200 focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+           viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobil Menü İçeriği -->
+  <div id="mobile-menu" class="hidden bg-[rgba(22,27,34,0.95)] md:hidden">
+    <nav class="px-4 pt-4 pb-6 space-y-2">
+      <a href="{{ url_for('core.index') }}" class="block text-gray-200 hover:text-white transition">Ana Sayfa</a>
+      <a href="{{ url_for('api.docs') }}" class="block text-gray-200 hover:text-white transition">API Docs</a>
+      <a href="{{ url_for('core.about') }}" class="block text-gray-200 hover:text-white transition">Hakkımızda</a>
+      <a href="{{ url_for('core.contact') }}" class="block text-gray-200 hover:text-white transition">İletişim</a>
+      <hr class="border-gray-700">
+      <a href="{{ url_for('auth.register') }}"
+         class="block px-4 py-2 border border-violet-400 text-violet-400 rounded hover:bg-violet-400 hover:text-white transition">
+        Üye Ol
+      </a>
+      <a href="{{ url_for('auth.login') }}"
+         class="block px-4 py-2 bg-violet-400 text-white rounded hover:bg-violet-500 transition">
+        Giriş Yap
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    document.getElementById('mobile-toggle').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+  </script>
+</header>
